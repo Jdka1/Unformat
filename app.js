@@ -13,7 +13,6 @@ const changeLabels = {
   entities: 'HTML entity decoded',
   whitespace: 'line or invisible whitespace cleanup',
   spaces: 'unusual space normalized',
-  Markdown: 'Markdown marker removed',
   quotes: 'smart quote converted',
   dashes: 'typographic dash converted',
   typography: 'ellipsis converted'

@@ -42,7 +42,7 @@ function protectFences(text, store, t, removeFences) {
   return text.replace(/(^|\n)([ \t]*)(`{3,}|~{3,})[^\n]*(\n|$)([\s\S]*?)(?:\n\2\3[ \t]*(?=\n|$)|$)/g,
     (whole, lead, indent, fence, afterStart, code) => {
       store.push(code);
-      if (removeFences) t.add('Markdown', 2);
+      if (removeFences) t.add('fenced-code delimiters removed', 2);
       return lead + (removeFences ? '' : `${indent}${fence}${afterStart}`) + `${FENCE_TOKEN}${store.length - 1}\uE001` + (removeFences ? '' : `\n${indent}${fence}`);
     });
 }
@@ -52,7 +52,7 @@ function restore(text, store, prefix) {
 }
 function protectInline(text, store, t) {
   return text.replace(/`([^`\n]+)`/g, (_, code) => {
-    store.push(code); t.add('Markdown', 2); return `${INLINE_TOKEN}${store.length - 1}\uE001`;
+    store.push(code); t.add('inline-code delimiters removed', 2); return `${INLINE_TOKEN}${store.length - 1}\uE001`;
   });
 }
 function decodeEntities(text, t) {
@@ -66,22 +66,22 @@ function decodeEntities(text, t) {
 }
 function markdown(text, options, t, inlines) {
   text = protectInline(text, inlines, t);
-  text = t.replace(text, /^(?: {0,3}#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$/gm, '$1', 'Markdown');
-  text = t.replace(text, /^[ \t]*(?:>\s?)+/gm, '', 'Markdown');
-  text = t.replace(text, /^[ \t]*(?:[-*_][ \t]*){3,}$/gm, '', 'Markdown');
-  text = t.replace(text, /^(\s*)[-*+]\s+\[([ xX])\]\s+/gm, (_, indent, done) => `${indent}- [${done.toLowerCase() === 'x' ? 'x' : ' '}] `, 'Markdown');
-  text = t.replace(text, /^(\s*)[*+]\s+/gm, '$1- ', 'Markdown');
-  text = t.replace(text, /!\[([^\]]*)\]\([^\s)]+(?:\s+"[^"]*")?\)/g, '$1', 'Markdown');
+  text = t.replace(text, /^(?: {0,3}#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$/gm, '$1', 'heading marker removed');
+  text = t.replace(text, /^[ \t]*(?:>\s?)+/gm, '', 'block quote marker removed');
+  text = t.replace(text, /^[ \t]*(?:[-*_][ \t]*){3,}$/gm, '', 'horizontal rule removed');
+  text = t.replace(text, /^(\s*)[-*+]\s+\[([ xX])\]\s+/gm, (_, indent, done) => `${indent}- [${done.toLowerCase() === 'x' ? 'x' : ' '}] `, 'task-list marker normalized');
+  text = t.replace(text, /^(\s*)[*+]\s+/gm, '$1- ', 'list bullet normalized');
+  text = t.replace(text, /!\[([^\]]*)\]\([^\s)]+(?:\s+"[^"]*")?\)/g, '$1', 'image syntax removed');
   text = t.replace(text, /\[([^\]]+)\]\(([^\s)]+)(?:\s+"[^"]*")?\)/g,
-    (_, label, url) => options.keepUrls ? `${label} (${url})` : label, 'Markdown');
-  text = t.replace(text, /<((?:https?:\/\/|mailto:)[^ >]+)>/g, '$1', 'Markdown');
+    (_, label, url) => options.keepUrls ? `${label} (${url})` : label, 'Markdown link converted');
+  text = t.replace(text, /<((?:https?:\/\/|mailto:)[^ >]+)>/g, '$1', 'autolink brackets removed');
   // Simple pipe tables: remove separator rows, retain readable TSV-like cells.
-  text = t.replace(text, /^[ \t]*\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-{3,}:?[ \t]*)+\|?[ \t]*$/gm, '', 'Markdown');
-  text = t.replace(text, /^[ \t]*\|[ \t]*(.*?)[ \t]*\|[ \t]*$/gm, (_, cells) => cells.split('|').map(x => x.trim()).join(' | '), 'Markdown');
-  text = t.replace(text, /(?<!\w)(\*\*\*|___)([^\n]+?)\1(?!\w)/g, '$2', 'Markdown');
-  text = t.replace(text, /(?<!\w)(\*\*|__)([^\n]+?)\1(?!\w)/g, '$2', 'Markdown');
-  text = t.replace(text, /~~([^\n]+?)~~/g, '$1', 'Markdown');
-  text = t.replace(text, /(?<!\w)(\*|_)([^\s\n][^\n]*?[^\s\n])\1(?!\w)/g, '$2', 'Markdown');
+  text = t.replace(text, /^[ \t]*\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-{3,}:?[ \t]*)+\|?[ \t]*$/gm, '', 'table separator removed');
+  text = t.replace(text, /^[ \t]*\|[ \t]*(.*?)[ \t]*\|[ \t]*$/gm, (_, cells) => cells.split('|').map(x => x.trim()).join(' | '), 'table row normalized');
+  text = t.replace(text, /(?<!\w)(\*\*\*|___)([^\n]+?)\1(?!\w)/g, '$2', 'bold-italic markers removed');
+  text = t.replace(text, /(?<!\w)(\*\*|__)([^\n]+?)\1(?!\w)/g, '$2', 'bold markers removed');
+  text = t.replace(text, /~~([^\n]+?)~~/g, '$1', 'strikethrough markers removed');
+  text = t.replace(text, /(?<!\w)(\*|_)([^\s\n][^\n]*?[^\s\n])\1(?!\w)/g, '$2', 'italic markers removed');
   return text;
 }
 
