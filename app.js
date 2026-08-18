@@ -6,6 +6,18 @@ const settingsKey = 'unformat-settings-v1';
 let selectedPreset = 'safe';
 let options = { ...PRESETS.safe };
 let syncingScroll = false;
+const changeLabels = {
+  Unicode: 'Unicode normalization applied',
+  encoding: 'mojibake sequence repaired',
+  'unrecoverable characters': 'unrecoverable character detected',
+  entities: 'HTML entity decoded',
+  whitespace: 'line or invisible whitespace cleanup',
+  spaces: 'unusual space normalized',
+  Markdown: 'Markdown marker removed',
+  quotes: 'smart quote converted',
+  dashes: 'typographic dash converted',
+  typography: 'ellipsis converted'
+};
 
 function loadSettings() {
   try {
@@ -26,8 +38,8 @@ function syncControls() {
   document.querySelectorAll('[data-option]').forEach(box => { box.checked = Boolean(options[box.dataset.option]); });
 }
 function formatSummary(result) {
-  const parts = Object.entries(result.changes).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, n]) => `${n} ${name}`);
-  return result.total ? `${result.total} fix${result.total === 1 ? '' : 'es'}: ${parts.join(' • ')}` : 'No formatting changes applied.';
+  const parts = Object.entries(result.changes).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([name, n]) => `${n} ${changeLabels[name] || name}`);
+  return result.total ? `${result.total} change${result.total === 1 ? '' : 's'} applied: ${parts.join(' • ')}` : 'No formatting changes applied.';
 }
 function renderChanges(result) {
   const panel = $('#changes');
@@ -37,7 +49,7 @@ function renderChanges(result) {
   panel.hidden = entries.length === 0;
   for (const [name, total] of entries) {
     const item = document.createElement('li');
-    item.textContent = `${total.toLocaleString()} ${name}`;
+    item.textContent = `${total.toLocaleString()} × ${changeLabels[name] || name}`;
     list.append(item);
   }
 }
