@@ -10,7 +10,10 @@
   <body>
     <main class="shell">
       <header class="site-header">
-        <div><h1>Unformat</h1><p>Paste formatted text. Copy clean plain text.</p></div>
+        <div class="brand">
+          <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="4" width="40" height="40" rx="11"/><path d="M15 17h18M15 24h13M15 31h9"/><path class="logo-cut" d="m29 29 7-7"/></svg>
+          <div><h1>Unformat</h1><p>Paste formatted text. Copy clean plain text.</p></div>
+        </div>
         <p class="privacy">Everything runs locally in your browser.<br>Your text is never uploaded.</p>
       </header>
 
@@ -40,6 +43,10 @@
         </div>
       </section>
       <p class="summary" id="summary" aria-live="polite">Ready when you are.</p>
+      <section class="changes" id="changes" aria-labelledby="changesTitle" hidden>
+        <h2 id="changesTitle">Changes made</h2>
+        <ul id="changeList"></ul>
+      </section>
 
       <details class="options" id="optionsPanel">
         <summary>Custom cleaning options</summary>

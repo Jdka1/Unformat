@@ -29,8 +29,20 @@ function formatSummary(result) {
   const parts = Object.entries(result.changes).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, n]) => `${n} ${name}`);
   return result.total ? `${result.total} fix${result.total === 1 ? '' : 'es'}: ${parts.join(' • ')}` : 'No formatting changes needed.';
 }
+function renderChanges(result) {
+  const panel = $('#changes');
+  const list = $('#changeList');
+  list.replaceChildren();
+  const entries = Object.entries(result.changes).sort((a, b) => b[1] - a[1]);
+  panel.hidden = entries.length === 0;
+  for (const [name, total] of entries) {
+    const item = document.createElement('li');
+    item.textContent = `${total.toLocaleString()} ${name}`;
+    list.append(item);
+  }
+}
 function clean() {
-  const result = cleanText(input.value, options); output.value = result.text; updateCounts(); summary.textContent = formatSummary(result);
+  const result = cleanText(input.value, options); output.value = result.text; updateCounts(); summary.textContent = formatSummary(result); renderChanges(result);
 }
 function choosePreset(name) {
   selectedPreset = name;
@@ -70,7 +82,7 @@ function syncScroll(source, destination) {
 input.addEventListener('scroll', () => syncScroll(input, output));
 output.addEventListener('scroll', () => syncScroll(output, input));
 $('#cleanButton').addEventListener('click', clean); $('#copyButton').addEventListener('click', copy); $('#pasteButton').addEventListener('click', paste);
-$('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; input.focus(); });
+$('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; $('#changes').hidden = true; input.focus(); });
 document.addEventListener('keydown', event => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') { event.preventDefault(); clean(); }
   if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'c') { event.preventDefault(); copy(); }
