@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Clean copied text locally: remove formatting artifacts, Markdown presentation, and typographic clutter.">
+    <title>Unformat — plain-text typography cleaner</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="site-header">
+        <div><h1>Unformat</h1><p>Paste formatted text. Copy clean plain text.</p></div>
+        <p class="privacy">Everything runs locally in your browser.<br>Your text is never uploaded.</p>
+      </header>
+
+      <section class="controls" aria-label="Cleaning settings">
+        <div class="presets" role="radiogroup" aria-label="Cleaning preset">
+          <button type="button" class="preset active" data-preset="safe" role="radio" aria-checked="true">Safe Clean</button>
+          <button type="button" class="preset" data-preset="plain" role="radio" aria-checked="false">Plain Text</button>
+          <button type="button" class="preset" data-preset="custom" role="radio" aria-checked="false">Custom</button>
+        </div>
+        <div class="actions">
+          <button type="button" class="button secondary" id="pasteButton">Paste</button>
+          <button type="button" class="button primary" id="cleanButton">Clean <kbd>⌘/Ctrl ↵</kbd></button>
+          <button type="button" class="button" id="clearButton">Clear</button>
+        </div>
+      </section>
+
+      <section class="editors" aria-label="Text editors">
+        <div class="editor-card">
+          <div class="editor-head"><label for="inputText">Original text</label><span id="inputCount">0 characters</span></div>
+          <textarea id="inputText" spellcheck="true" placeholder="Paste text here…" aria-describedby="inputHelp"></textarea>
+          <span id="inputHelp" class="sr-only">Paste text copied from an AI tool, website, or rich-text editor.</span>
+        </div>
+        <div class="editor-card output-card">
+          <div class="editor-head"><label for="outputText">Clean text</label><span id="outputCount">0 characters</span></div>
+          <textarea id="outputText" readonly spellcheck="false" placeholder="Your cleaned text will appear here."></textarea>
+          <button type="button" class="copy-button" id="copyButton" aria-label="Copy cleaned text">Copy <kbd>⌘/Ctrl ⇧ C</kbd></button>
+        </div>
+      </section>
+      <p class="summary" id="summary" aria-live="polite">Ready when you are.</p>
+
+      <details class="options" id="optionsPanel">
+        <summary>Custom cleaning options</summary>
+        <p class="option-note">Smart quotes and em dashes are legitimate typography. Plain Text merely converts them when keyboard-style text is more useful.</p>
+        <div class="option-grid">
+          <label><input type="checkbox" data-option="repairMojibake"> Repair common mojibake</label>
+          <label><input type="checkbox" data-option="decodeEntities"> Decode HTML entities</label>
+          <label><input type="checkbox" data-option="normalizeSpaces"> Normalize unusual spaces</label>
+          <label><input type="checkbox" data-option="removeInvisibles"> Remove copy/paste invisibles</label>
+          <label><input type="checkbox" data-option="normalizeLines"> Normalize line endings</label>
+          <label><input type="checkbox" data-option="collapseBlankLines"> Limit blank lines</label>
+          <label><input type="checkbox" data-option="markdown"> Remove Markdown presentation</label>
+          <label><input type="checkbox" data-option="keepUrls"> Keep Markdown link URLs</label>
+          <label><input type="checkbox" data-option="quotes"> Straighten smart quotes</label>
+          <label><input type="checkbox" data-option="dashes"> Convert en/em dashes</label>
+          <label><input type="checkbox" data-option="ellipsis"> Convert ellipsis to three dots</label>
+          <label><input type="checkbox" data-option="englishSpacing"> Normalize English prose spacing</label>
+          <label><input type="checkbox" data-option="normalizeNfkc"> Use aggressive NFKC compatibility normalization</label>
+        </div>
+        <p class="warning">NFKC is more aggressive and can change compatibility characters. Zero-width joiners/non-joiners and bidirectional controls are preserved.</p>
+      </details>
+    </main>
+    <footer>Unformat changes formatting, not your words.</footer>
+    <div id="liveStatus" class="sr-only" aria-live="assertive"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

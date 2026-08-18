@@ -1,0 +1,63 @@
+import { cleanText, PRESETS } from './cleaner.js';
+
+const $ = selector => document.querySelector(selector);
+const input = $('#inputText'), output = $('#outputText'), summary = $('#summary'), live = $('#liveStatus');
+const settingsKey = 'unformat-settings-v1';
+let selectedPreset = 'safe';
+let options = { ...PRESETS.safe };
+
+function loadSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(settingsKey));
+    if (saved && ['safe', 'plain', 'custom'].includes(saved.preset)) {
+      selectedPreset = saved.preset; options = { ...PRESETS.safe, ...saved.options };
+    }
+  } catch { /* Settings are optional. */ }
+}
+function saveSettings() { try { localStorage.setItem(settingsKey, JSON.stringify({ preset: selectedPreset, options })); } catch {} }
+function count(value) { return `${value.length.toLocaleString()} character${value.length === 1 ? '' : 's'}`; }
+function updateCounts() { $('#inputCount').textContent = count(input.value); $('#outputCount').textContent = count(output.value); }
+function syncControls() {
+  document.querySelectorAll('.preset').forEach(button => {
+    const active = button.dataset.preset === selectedPreset;
+    button.classList.toggle('active', active); button.setAttribute('aria-checked', String(active));
+  });
+  document.querySelectorAll('[data-option]').forEach(box => { box.checked = Boolean(options[box.dataset.option]); });
+}
+function formatSummary(result) {
+  const parts = Object.entries(result.changes).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, n]) => `${n} ${name}`);
+  return result.total ? `${result.total} fix${result.total === 1 ? '' : 'es'}: ${parts.join(' • ')}` : 'No formatting changes needed.';
+}
+function clean() {
+  const result = cleanText(input.value, options); output.value = result.text; updateCounts(); summary.textContent = formatSummary(result);
+}
+function choosePreset(name) {
+  selectedPreset = name;
+  if (name !== 'custom') options = { ...PRESETS[name] };
+  if (name === 'custom') $('#optionsPanel').open = true;
+  syncControls(); saveSettings(); clean();
+}
+async function copy() {
+  if (!output.value) return;
+  try { await navigator.clipboard.writeText(output.value); }
+  catch { output.focus(); output.select(); document.execCommand('copy'); }
+  const button = $('#copyButton'); button.classList.add('copied'); button.firstChild.textContent = 'Copied ';
+  live.textContent = 'Cleaned text copied.';
+  setTimeout(() => { button.classList.remove('copied'); button.firstChild.textContent = 'Copy '; }, 1400);
+}
+async function paste() {
+  try { input.value = await navigator.clipboard.readText(); updateCounts(); clean(); live.textContent = 'Pasted text.'; }
+  catch { input.focus(); summary.textContent = 'Paste permission was not available. Use your browser’s paste shortcut.'; }
+}
+loadSettings(); syncControls(); updateCounts();
+$('.presets').addEventListener('click', event => { const button = event.target.closest('[data-preset]'); if (button) choosePreset(button.dataset.preset); });
+document.querySelectorAll('[data-option]').forEach(box => box.addEventListener('change', () => {
+  options[box.dataset.option] = box.checked; selectedPreset = 'custom'; syncControls(); saveSettings(); clean();
+}));
+input.addEventListener('input', () => { updateCounts(); clean(); });
+$('#cleanButton').addEventListener('click', clean); $('#copyButton').addEventListener('click', copy); $('#pasteButton').addEventListener('click', paste);
+$('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; input.focus(); });
+document.addEventListener('keydown', event => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') { event.preventDefault(); clean(); }
+  if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'c') { event.preventDefault(); copy(); }
+});
