@@ -6,6 +6,8 @@ Browser-based cleanup for pasted text. Try it out at [jdka1.github.io/Unformat](
 
 Unformat processes text locally and does not rewrite its content. It removes copy/paste artifacts while preserving protected code and meaningful Unicode by default.
 
+It is a formatting normalizer—not a content linter. For text copied from AI tools, it can remove common presentation artifacts such as Markdown markers, smart quotes, em dashes, ellipses, non-breaking spaces, hidden characters, and mojibake. Those characters are legitimate typography; conversion is optional and never changes the wording.
+
 ## Capabilities
 
 - Unicode, whitespace, line-ending, HTML-entity, and mojibake cleanup
