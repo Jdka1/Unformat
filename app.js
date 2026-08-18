@@ -5,6 +5,7 @@ const input = $('#inputText'), output = $('#outputText'), summary = $('#summary'
 const settingsKey = 'unformat-settings-v1';
 let selectedPreset = 'safe';
 let options = { ...PRESETS.safe };
+let syncingScroll = false;
 
 function loadSettings() {
   try {
@@ -55,6 +56,19 @@ document.querySelectorAll('[data-option]').forEach(box => box.addEventListener('
   options[box.dataset.option] = box.checked; selectedPreset = 'custom'; syncControls(); saveSettings(); clean();
 }));
 input.addEventListener('input', () => { updateCounts(); clean(); });
+function syncScroll(source, destination) {
+  if (syncingScroll) return;
+  syncingScroll = true;
+  const sourceMaxY = Math.max(1, source.scrollHeight - source.clientHeight);
+  const destinationMaxY = Math.max(0, destination.scrollHeight - destination.clientHeight);
+  const sourceMaxX = Math.max(1, source.scrollWidth - source.clientWidth);
+  const destinationMaxX = Math.max(0, destination.scrollWidth - destination.clientWidth);
+  destination.scrollTop = (source.scrollTop / sourceMaxY) * destinationMaxY;
+  destination.scrollLeft = (source.scrollLeft / sourceMaxX) * destinationMaxX;
+  requestAnimationFrame(() => { syncingScroll = false; });
+}
+input.addEventListener('scroll', () => syncScroll(input, output));
+output.addEventListener('scroll', () => syncScroll(output, input));
 $('#cleanButton').addEventListener('click', clean); $('#copyButton').addEventListener('click', copy); $('#pasteButton').addEventListener('click', paste);
 $('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; input.focus(); });
 document.addEventListener('keydown', event => {
