@@ -1,15 +1,36 @@
 # Unformat
 
+Clean pasted text without changing what it says.
+
+Try it out at [jdka1.github.io/Unformat](https://jdka1.github.io/Unformat/).
+
+## Example
+
+```text
+### **Important** — “Don’t forget…”
+```
+
+becomes:
+
+```text
+Important - "Don't forget..."
+```
+
+## Handles
+
+- Copy/paste whitespace and hidden-character artifacts
+- Smart typography, mojibake, HTML entities, and line-ending cleanup
+- Markdown headings, links, lists, tables, inline code, and fenced code blocks
+- Optional keyboard-style plain text conversion
+
+All processing runs locally in the browser. Unformat preserves wording, protected code, emoji sequences, and multilingual joiners by default.
+
+## Tests
+
 [![Tests](https://github.com/Jdka1/Unformat/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Jdka1/Unformat/actions/workflows/test.yml)
 
-Browser-based cleanup for pasted text. Try it out at [jdka1.github.io/Unformat](https://jdka1.github.io/Unformat/).
+The test suite covers typography, Unicode spaces and joiners, Markdown cleanup, protected code regions, mojibake repair, idempotence, and large input performance.
 
-Unformat processes text locally and does not rewrite its content. It removes copy/paste artifacts while preserving protected code and meaningful Unicode by default.
-
-It is a formatting normalizer—not a content linter. For text copied from AI tools, it can remove common presentation artifacts such as Markdown markers, smart quotes, em dashes, ellipses, non-breaking spaces, hidden characters, and mojibake. Those characters are legitimate typography; conversion is optional and never changes the wording.
-
-## Capabilities
-
-- Unicode, whitespace, line-ending, HTML-entity, and mojibake cleanup
-- Markdown presentation cleanup, including links, lists, tables, and code regions
-- Optional plain-text conversion for typographic quotes, dashes, ellipses, and English spacing
+```sh
+npm test
+```
