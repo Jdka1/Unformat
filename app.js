@@ -27,7 +27,7 @@ function syncControls() {
 }
 function formatSummary(result) {
   const parts = Object.entries(result.changes).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, n]) => `${n} ${name}`);
-  return result.total ? `${result.total} fix${result.total === 1 ? '' : 'es'}: ${parts.join(' • ')}` : 'No formatting changes needed.';
+  return result.total ? `${result.total} fix${result.total === 1 ? '' : 'es'}: ${parts.join(' • ')}` : 'No formatting changes applied.';
 }
 function renderChanges(result) {
   const panel = $('#changes');
