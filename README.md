@@ -1,6 +1,6 @@
 # Unformat
 
-[![Tests](https://github.com/Jdka1/unformat/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Jdka1/unformat/actions/workflows/test.yml)
+[![Tests](https://github.com/Jdka1/Unformat/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Jdka1/Unformat/actions/workflows/test.yml)
 
 Clean copy/paste artifacts into useful plain text—entirely in your browser.
 
@@ -25,6 +25,6 @@ Open `http://localhost:8000`.
 
 ## Publish with GitHub Pages
 
-Push `main`, then choose **Settings → Pages → Deploy from a branch → main → /(root) → Save**. The site will be at `https://YOUR-USERNAME.github.io/unformat/`.
+Push `main`, then choose **Settings → Pages → Deploy from a branch → main → /(root) → Save**. The site will be at `https://Jdka1.github.io/Unformat/`.
 
 Every push runs the test workflow; the badge above updates with its latest result. See [GitHub’s badge documentation](https://docs.github.com/en/actions/how-tos/monitor-workflows/add-a-status-badge) and [Pages branch deployment guide](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
