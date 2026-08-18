@@ -93,6 +93,13 @@ function syncScroll(source, destination) {
 }
 input.addEventListener('scroll', () => syncScroll(input, output));
 output.addEventListener('scroll', () => syncScroll(output, input));
+function preventEditorOverscroll(event) {
+  const editor = event.currentTarget;
+  const maxScroll = editor.scrollHeight - editor.clientHeight;
+  if ((event.deltaY < 0 && editor.scrollTop <= 0) || (event.deltaY > 0 && editor.scrollTop >= maxScroll)) event.preventDefault();
+}
+input.addEventListener('wheel', preventEditorOverscroll, { passive: false });
+output.addEventListener('wheel', preventEditorOverscroll, { passive: false });
 $('#cleanButton').addEventListener('click', clean); $('#copyButton').addEventListener('click', copy); $('#pasteButton').addEventListener('click', paste);
 $('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; $('#changes').hidden = true; input.focus(); });
 document.addEventListener('keydown', event => {
