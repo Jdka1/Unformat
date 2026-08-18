@@ -2,29 +2,12 @@
 
 [![Tests](https://github.com/Jdka1/Unformat/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Jdka1/Unformat/actions/workflows/test.yml)
 
-Clean copy/paste artifacts into useful plain text—entirely in your browser.
+Browser-based cleanup for pasted text. [Open the site.](https://jdka1.github.io/Unformat/)
 
-**No uploads. No accounts. No rewriting.**
+Unformat processes text locally and does not rewrite its content. It removes copy/paste artifacts while preserving protected code and meaningful Unicode by default.
 
-## What it cleans
+## Capabilities
 
-- Unicode, odd spaces, hidden characters, line endings, and common mojibake
-- Markdown headings, emphasis, links, lists, tables, and code fences
-- Optional keyboard-style quotes, dashes, ellipses, and English prose spacing
-
-Smart quotes and em dashes are valid typography; Unformat changes them only when you choose Plain Text. Code blocks and emoji joiner sequences stay protected.
-
-## Use locally
-
-```sh
-python3 -m http.server 8000
-npm test
-```
-
-Open `http://localhost:8000`.
-
-## Publish with GitHub Pages
-
-Push `main`, then choose **Settings → Pages → Deploy from a branch → main → /(root) → Save**. The site will be at `https://Jdka1.github.io/Unformat/`.
-
-Every push runs the test workflow; the badge above updates with its latest result. See [GitHub’s badge documentation](https://docs.github.com/en/actions/how-tos/monitor-workflows/add-a-status-badge) and [Pages branch deployment guide](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+- Unicode, whitespace, line-ending, HTML-entity, and mojibake cleanup
+- Markdown presentation cleanup, including links, lists, tables, and code regions
+- Optional plain-text conversion for typographic quotes, dashes, ellipses, and English spacing
