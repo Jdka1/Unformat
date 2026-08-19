@@ -39,11 +39,11 @@ function tracker() {
 }
 
 function protectFences(text, store, t, removeFences) {
-  return text.replace(/(^|\n)([ \t]*)(`{3,}|~{3,})[^\n]*(\n|$)([\s\S]*?)(?:\n\2\3[ \t]*(?=\n|$)|$)/g,
-    (whole, lead, indent, fence, afterStart, code) => {
+  return text.replace(/(^|\n)([ \t]*)(`{3,}|~{3,})([^\n]*)(\n|$)([\s\S]*?)(?:\n\2\3[ \t]*(?=\n|$)|$)/g,
+    (whole, lead, indent, fence, info, afterStart, code) => {
       store.push(code);
       if (removeFences) t.add('fenced-code delimiters removed', 2);
-      return lead + (removeFences ? '' : `${indent}${fence}${afterStart}`) + `${FENCE_TOKEN}${store.length - 1}\uE001` + (removeFences ? '' : `\n${indent}${fence}`);
+      return lead + (removeFences ? '' : `${indent}${fence}${info}${afterStart}`) + `${FENCE_TOKEN}${store.length - 1}\uE001` + (removeFences ? '' : `\n${indent}${fence}`);
     });
 }
 function restore(text, store, prefix) {

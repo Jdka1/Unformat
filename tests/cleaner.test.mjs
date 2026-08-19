@@ -25,6 +25,7 @@ test('links, images, autolinks, and URLs', () => {
 test('inline and fenced code contents are protected', () => {
   assert.equal(plain('Use `foo_bar() — “x”` now.'), 'Use foo_bar() — “x” now.');
   assert.equal(plain('Before\n```js\nconst s = "**hello** — world";\n```\nAfter'), 'Before\nconst s = "**hello** — world";\nAfter');
+  assert.equal(safe('```js\nconst s = "**hello** — world";\n```'), '```js\nconst s = "**hello** — world";\n```');
 });
 test('mojibake repairs before typography conversion', () => {
   assert.equal(safe('â€œHiâ€\x9d â€” x'), '“Hi” — x');
