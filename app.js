@@ -48,6 +48,7 @@ function renderChanges(result) {
   list.replaceChildren();
   const entries = Object.entries(result.changes).sort((a, b) => b[1] - a[1]);
   panel.hidden = entries.length === 0;
+  $('.editors').classList.toggle('has-changes', entries.length > 0);
   changeDetails = result.details.slice(0, 16);
   for (const [index, detail] of changeDetails.entries()) {
     const item = document.createElement('li');
@@ -130,7 +131,7 @@ input.addEventListener('wheel', preventEditorOverscroll, { passive: false });
 output.addEventListener('wheel', preventEditorOverscroll, { passive: false });
 $('#cleanButton').addEventListener('click', clean); $('#copyButton').addEventListener('click', copy); $('#pasteButton').addEventListener('click', paste);
 $('#demoButton').addEventListener('click', () => { input.value = demoText; choosePreset('plain'); input.focus(); live.textContent = 'Example loaded in Plain Text mode.'; });
-$('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; $('#changes').hidden = true; input.focus(); });
+$('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; $('#changes').hidden = true; $('.editors').classList.remove('has-changes'); input.focus(); });
 $('#changeList').addEventListener('click', event => {
   const button = event.target.closest('[data-change-index]');
   if (button) locateChange(changeDetails[Number(button.dataset.changeIndex)]);
