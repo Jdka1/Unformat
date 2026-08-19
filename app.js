@@ -3,6 +3,7 @@ import { cleanText, PRESETS } from './cleaner.js';
 const $ = selector => document.querySelector(selector);
 const input = $('#inputText'), output = $('#outputText'), summary = $('#summary'), live = $('#liveStatus');
 const settingsKey = 'unformat-settings-v1';
+const demoText = "### **Important** \u2014 \u201CDon\u2019t forget\u2026\u201D\n\n> Copy/paste can introduce\u00a0odd spaces, a soft hyphen co\u00adoperate, and mojibake: \u00e2\u20ac\u2122hello\u00e2\u20ac\u009d.\n\n- [x] Keep this task\n- [ ] Review [the docs](https://example.com/docs?source=ai_tool)\n\nUse `foo_bar() \u2014 \u201Cexact\u201D` here.\n\n```js\nconst message = \"**hello** \u2014 world\";\n```\n\nFamily emoji: \u{1F468}\u200d\u{1F469}\u200d\u{1F467}\u200d\u{1F466}\n";
 let selectedPreset = 'safe';
 let options = { ...PRESETS.safe };
 let syncingScroll = false;
@@ -129,6 +130,7 @@ function preventEditorOverscroll(event) {
 input.addEventListener('wheel', preventEditorOverscroll, { passive: false });
 output.addEventListener('wheel', preventEditorOverscroll, { passive: false });
 $('#cleanButton').addEventListener('click', clean); $('#copyButton').addEventListener('click', copy); $('#pasteButton').addEventListener('click', paste);
+$('#demoButton').addEventListener('click', () => { input.value = demoText; updateCounts(); clean(); input.focus(); });
 $('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; $('#changes').hidden = true; input.focus(); });
 $('#changeList').addEventListener('click', event => {
   const button = event.target.closest('[data-change-index]');
