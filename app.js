@@ -6,6 +6,7 @@ const settingsKey = 'unformat-settings-v1';
 let selectedPreset = 'safe';
 let options = { ...PRESETS.safe };
 let syncingScroll = false;
+let changeDetails = [];
 const changeLabels = {
   Unicode: 'Unicode normalization applied',
   encoding: 'mojibake sequence repaired',
@@ -46,11 +47,37 @@ function renderChanges(result) {
   list.replaceChildren();
   const entries = Object.entries(result.changes).sort((a, b) => b[1] - a[1]);
   panel.hidden = entries.length === 0;
-  for (const [name, total] of entries) {
+  changeDetails = result.details.slice(0, 16);
+  for (const [index, detail] of changeDetails.entries()) {
     const item = document.createElement('li');
-    item.textContent = `${total.toLocaleString()} × ${changeLabels[name] || name}`;
+    item.className = 'change-detail';
+    const button = document.createElement('button');
+    button.type = 'button'; button.dataset.changeIndex = index;
+    const label = document.createElement('span');
+    label.textContent = `${changeLabels[detail.category] || detail.category} · line ${detail.line}`;
+    const pair = document.createElement('code');
+    pair.textContent = `${displayText(detail.before)} → ${displayText(detail.after)}`;
+    button.append(label, pair); item.append(button); list.append(item);
+  }
+  const detailedCategories = new Set(changeDetails.map(detail => detail.category));
+  for (const [category, total] of entries) {
+    if (detailedCategories.has(category)) continue;
+    const item = document.createElement('li');
+    item.className = 'change-detail change-detail-static';
+    item.textContent = `${total.toLocaleString()} × ${changeLabels[category] || category}`;
     list.append(item);
   }
+}
+function displayText(value) {
+  const names = { '\u00a0': 'NBSP', '\u00ad': 'soft hyphen', '\u200b': 'zero-width space', '\u2060': 'word joiner', '\ufeff': 'BOM', '\n': '↵', '\t': '⇥' };
+  return [...value].map(character => names[character] || character).join('') || 'removed';
+}
+function locateChange(detail) {
+  const inputIndex = input.value.indexOf(detail.before);
+  const outputIndex = output.value.indexOf(detail.after);
+  if (inputIndex >= 0) input.setSelectionRange(inputIndex, inputIndex + detail.before.length);
+  if (outputIndex >= 0) output.setSelectionRange(outputIndex, outputIndex + detail.after.length);
+  if (outputIndex >= 0) output.focus(); else if (inputIndex >= 0) input.focus();
 }
 function clean() {
   const result = cleanText(input.value, options); output.value = result.text; updateCounts(); summary.textContent = formatSummary(result); renderChanges(result);
@@ -101,6 +128,10 @@ input.addEventListener('wheel', preventEditorOverscroll, { passive: false });
 output.addEventListener('wheel', preventEditorOverscroll, { passive: false });
 $('#cleanButton').addEventListener('click', clean); $('#copyButton').addEventListener('click', copy); $('#pasteButton').addEventListener('click', paste);
 $('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; $('#changes').hidden = true; input.focus(); });
+$('#changeList').addEventListener('click', event => {
+  const button = event.target.closest('[data-change-index]');
+  if (button) locateChange(changeDetails[Number(button.dataset.changeIndex)]);
+});
 document.addEventListener('keydown', event => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') { event.preventDefault(); clean(); }
   if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'c') { event.preventDefault(); copy(); }

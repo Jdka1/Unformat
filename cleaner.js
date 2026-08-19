@@ -27,12 +27,34 @@ const mojibake = new Map([
 
 function tracker() {
   const changes = {};
+  const details = [];
   return {
     changes,
+    details,
     add(category, count) { if (count) changes[category] = (changes[category] || 0) + count; },
     replace(text, regex, value, category) {
-      const count = Array.from(text.matchAll(regex)).length;
-      const output = typeof value === 'function' ? text.replace(regex, value) : text.replace(regex, value);
+      let count = 0;
+      let lastOffset = 0;
+      let line = 1;
+      const output = text.replace(regex, (...args) => {
+        const hasGroups = typeof args.at(-1) === 'object';
+        const input = args.at(hasGroups ? -2 : -1);
+        const offset = args.at(hasGroups ? -3 : -2);
+        const captures = args.slice(1, hasGroups ? -3 : -2);
+        line += (text.slice(lastOffset, offset).match(/\n/g) || []).length;
+        const replacement = typeof value === 'function' ? value(...args) : value.replace(/\$(\$|&|\d{1,2})/g, (_, token) => {
+          if (token === '$') return '$';
+          if (token === '&') return args[0];
+          return captures[Number(token) - 1] ?? '';
+        });
+        if (replacement !== args[0]) {
+          count++;
+          details.push({ category, before: args[0], after: replacement, line });
+        }
+        line += (args[0].match(/\n/g) || []).length;
+        lastOffset = offset + args[0].length;
+        return replacement;
+      });
       this.add(category, count); return output;
     }
   };
@@ -124,5 +146,5 @@ export function cleanText(input, suppliedOptions = PRESETS.safe) {
   if (options.collapseBlankLines) text = t.replace(text, /\n{3,}/g, '\n\n', 'whitespace');
   text = restore(text, inlines, INLINE_TOKEN);
   text = restore(text, fences, FENCE_TOKEN);
-  return { text, changes: t.changes, total: Object.values(t.changes).reduce((a, b) => a + b, 0) };
+  return { text, changes: t.changes, details: t.details, total: Object.values(t.changes).reduce((a, b) => a + b, 0) };
 }
