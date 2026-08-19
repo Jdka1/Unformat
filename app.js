@@ -7,6 +7,7 @@ let selectedPreset = 'safe';
 let options = { ...PRESETS.safe };
 let syncingScroll = false;
 let changeDetails = [];
+let hoveredChangeIndex = -1;
 const changeLabels = {
   Unicode: 'Unicode normalization applied',
   encoding: 'mojibake sequence repaired',
@@ -48,6 +49,7 @@ function renderChanges(result) {
   const entries = Object.entries(result.changes).sort((a, b) => b[1] - a[1]);
   panel.hidden = entries.length === 0;
   changeDetails = result.details.slice(0, 16);
+  hoveredChangeIndex = -1;
   for (const [index, detail] of changeDetails.entries()) {
     const item = document.createElement('li');
     item.className = 'change-detail';
@@ -72,12 +74,12 @@ function displayText(value) {
   const names = { '\u00a0': 'NBSP', '\u00ad': 'soft hyphen', '\u200b': 'zero-width space', '\u2060': 'word joiner', '\ufeff': 'BOM', '\n': '↵', '\t': '⇥' };
   return [...value].map(character => names[character] || character).join('') || 'removed';
 }
-function locateChange(detail) {
+function locateChange(detail, focus = true) {
   const inputIndex = input.value.indexOf(detail.before);
   const outputIndex = output.value.indexOf(detail.after);
   if (inputIndex >= 0) input.setSelectionRange(inputIndex, inputIndex + detail.before.length);
   if (outputIndex >= 0) output.setSelectionRange(outputIndex, outputIndex + detail.after.length);
-  if (outputIndex >= 0) output.focus(); else if (inputIndex >= 0) input.focus();
+  if (focus && outputIndex >= 0) output.focus(); else if (focus && inputIndex >= 0) input.focus();
 }
 function clean() {
   const result = cleanText(input.value, options); output.value = result.text; updateCounts(); summary.textContent = formatSummary(result); renderChanges(result);
@@ -131,6 +133,14 @@ $('#clearButton').addEventListener('click', () => { input.value = ''; output.val
 $('#changeList').addEventListener('click', event => {
   const button = event.target.closest('[data-change-index]');
   if (button) locateChange(changeDetails[Number(button.dataset.changeIndex)]);
+});
+$('#changeList').addEventListener('pointerover', event => {
+  const button = event.target.closest('[data-change-index]');
+  if (!button) return;
+  const index = Number(button.dataset.changeIndex);
+  if (index === hoveredChangeIndex) return;
+  hoveredChangeIndex = index;
+  locateChange(changeDetails[index], false);
 });
 document.addEventListener('keydown', event => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') { event.preventDefault(); clean(); }
