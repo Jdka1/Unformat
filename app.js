@@ -8,7 +8,6 @@ let selectedPreset = 'safe';
 let options = { ...PRESETS.safe };
 let syncingScroll = false;
 let changeDetails = [];
-let hoveredChangeIndex = -1;
 const changeLabels = {
   Unicode: 'Unicode normalization applied',
   encoding: 'mojibake sequence repaired',
@@ -50,7 +49,6 @@ function renderChanges(result) {
   const entries = Object.entries(result.changes).sort((a, b) => b[1] - a[1]);
   panel.hidden = entries.length === 0;
   changeDetails = result.details.slice(0, 16);
-  hoveredChangeIndex = -1;
   for (const [index, detail] of changeDetails.entries()) {
     const item = document.createElement('li');
     item.className = 'change-detail';
@@ -61,6 +59,7 @@ function renderChanges(result) {
     const pair = document.createElement('code');
     pair.textContent = `${displayText(detail.before)} → ${displayText(detail.after)}`;
     button.append(label, pair); item.append(button); list.append(item);
+    button.addEventListener('mouseenter', () => locateChange(detail));
   }
   const detailedCategories = new Set(changeDetails.map(detail => detail.category));
   for (const [category, total] of entries) {
@@ -135,14 +134,6 @@ $('#clearButton').addEventListener('click', () => { input.value = ''; output.val
 $('#changeList').addEventListener('click', event => {
   const button = event.target.closest('[data-change-index]');
   if (button) locateChange(changeDetails[Number(button.dataset.changeIndex)]);
-});
-$('#changeList').addEventListener('pointerover', event => {
-  const button = event.target.closest('[data-change-index]');
-  if (!button) return;
-  const index = Number(button.dataset.changeIndex);
-  if (index === hoveredChangeIndex) return;
-  hoveredChangeIndex = index;
-  locateChange(changeDetails[index], false);
 });
 document.addEventListener('keydown', event => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') { event.preventDefault(); clean(); }
