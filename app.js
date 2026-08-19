@@ -130,7 +130,7 @@ function preventEditorOverscroll(event) {
 input.addEventListener('wheel', preventEditorOverscroll, { passive: false });
 output.addEventListener('wheel', preventEditorOverscroll, { passive: false });
 $('#cleanButton').addEventListener('click', clean); $('#copyButton').addEventListener('click', copy); $('#pasteButton').addEventListener('click', paste);
-$('#demoButton').addEventListener('click', () => { input.value = demoText; updateCounts(); clean(); input.focus(); });
+$('#demoButton').addEventListener('click', () => { input.value = demoText; choosePreset('plain'); input.focus(); live.textContent = 'Example loaded in Plain Text mode.'; });
 $('#clearButton').addEventListener('click', () => { input.value = ''; output.value = ''; updateCounts(); summary.textContent = 'Ready when you are.'; $('#changes').hidden = true; input.focus(); });
 $('#changeList').addEventListener('click', event => {
   const button = event.target.closest('[data-change-index]');
